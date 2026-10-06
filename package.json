@@ -1,0 +1,10 @@
+{
+  "name": "mailchat-for-thunderbird",
+  "version": "1.4.0",
+  "private": true,
+  "type": "module",
+  "description": "Local Thunderbird integration for Codex chats with opt-in autonomous sending",
+  "license": "MIT",
+  "scripts": {"build": "node scripts/build.mjs", "test": "node --test tests/*.test.mjs"},
+  "engines": {"node": ">=22"}
+}

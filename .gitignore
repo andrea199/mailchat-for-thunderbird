@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.test-artifacts/
+connection.json
+Collegamento.txt
+installation.json
+attachments/
+*.bak
+*.tmp
+.env*
+*.log

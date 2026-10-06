@@ -1,0 +1,13 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><title>MailChat for Thunderbird</title><link rel="stylesheet" href="status.css"></head><body>
+<main><header><img src="icons/icon-128.png" width="80" height="80" alt="MailChat"><div><h1>MailChat for Thunderbird</h1><p>Le tue email, nella tua chat.</p></div></header>
+<p id="status" role="status">Controllo del collegamento…</p>
+<section><h2>1. Collega questo PC</h2><p>Installa il ponte Windows scaricato da GitHub e copia qui la chiave mostrata nel file Collegamento.txt. La chiave resta su questo PC: non inviarla nella chat.</p>
+<label for="token">Chiave di collegamento</label><input id="token" type="password" autocomplete="off" spellcheck="false" maxlength="64">
+<label class="check"><input id="consent" type="checkbox">Consento il collegamento alla chat. Le email e gli allegati che richiedo possono essere trasmessi al servizio AI usato dalla chat. Il progetto non gestisce un server email e non raccoglie telemetria.</label></section>
+<section><h2>2. Scegli come lavorare</h2>
+<label class="choice"><input type="radio" name="mode" value="drafts" checked><span><strong>Solo bozze — consigliata</strong><br>Cerca, legge e prepara email e risposte con firma e storico. Controlli e invii personalmente da Thunderbird.</span></label>
+<label class="choice"><input type="radio" name="mode" value="autonomous"><span><strong>Invio automatico</strong><br>La chat può inviare nuove email e risposte senza un’ulteriore revisione. Richiede anche questa modalità nel ponte Windows e il permesso facoltativo di Thunderbird.</span></label>
+<label class="check"><input id="confirmSend" type="checkbox">Comprendo che, in modalità automatica, una richiesta nella chat può causare l’invio immediato di una mail, anche se la chat interpreta male la mia intenzione.</label>
+<button id="save" type="button">Salva impostazioni</button><button id="disable" type="button">Torna a Solo bozze</button><button id="disconnect" type="button">Disconnetti</button></section>
+<p><a href="https://github.com/andrea199/mailchat-for-thunderbird">Download e guida</a> · <a href="https://github.com/andrea199/mailchat-for-thunderbird/blob/main/PRIVACY.md">Privacy</a> · <a href="https://github.com/andrea199/mailchat-for-thunderbird/issues">Assistenza</a></p>
+<p>Windows · Thunderbird 153+ · Node.js 22+ · Codex desktop, chat locale. La modalità attiva viene mostrata qui e dallo strumento di verifica nella chat.</p></main><script src="status.js"></script></body></html>

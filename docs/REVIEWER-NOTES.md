@@ -1,0 +1,13 @@
+# Reviewer notes — MailChat 1.4.0 beta
+
+This is an independent Thunderbird MailExtension paired with a local Node.js MCP bridge for Codex desktop on Windows. No paid developer site, hosted MailChat service, API credentials or private account data are required by this project. Codex itself requires its own account. The XPI alone does not provide the local bridge.
+
+Minimum Thunderbird version: 153. Node.js: 22+. Manifest V2, no Experiment APIs, no third-party runtime libraries, no remote executable code. Source JS is readable and bundled without transpilation/minification. Build: `node scripts/build.mjs` from the source root. Test: `node --test tests/*.test.mjs`. Generated timestamps in ZIP files can differ; extracted files match committed sources.
+
+Use an isolated Windows user/Codex profile and Thunderbird test mail account. Download and extract the Windows release ZIP, run Installa.cmd and choose drafts-only. Install the XPI, open options, paste the generated local pairing key, accept the data-sharing notice and save. Restart Codex and leave Thunderbird open. Invoke status, accounts, search/read and prepare a new draft or reply. Inspect signature, recipients and complete RFC-linked predecessor quotation. Missing references fail explicitly rather than quietly losing history.
+
+Drafts-only exposes no MCP send tools, rejects send RPCs in the bridge and has no compose.send permission in the extension. To test autonomous mode, rerun the installer with choice 2 and its typed confirmation; separately choose autonomous mode in extension options, tick confirmation and grant the optional permission. Use only test recipients. Sending checks the saved draft hash, exact recipients/attachments/thread, policy and permission again at the native send boundary. Uncertain outcomes cannot be repeated using the same operation record. Revoking mode or permission blocks subsequent sends. No tool can modify the mode settings.
+
+Required permissions provide account identities/signatures, message searching/reading, selected attachment access, draft composition and local settings. compose.send is optional. Authenticated HTTP is restricted to fixed localhost 127.0.0.1:37629. Host and browser Origin checks plus distinct random client/add-on tokens are used. Pairing/consent is mandatory. Mail contents returned to Codex may be processed by its AI provider; notice and user consent are in the options page and PRIVACY.md. The project runs no cloud mail endpoint or telemetry.
+
+This release has automated mock/HTTP/installer tests; real Thunderbird/Codex end-to-end validation remains a beta testing requirement. It is not represented as already reviewed or approved by ATN.
