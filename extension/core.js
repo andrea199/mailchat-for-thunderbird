@@ -4,17 +4,17 @@
   const ref = id => `${session}:${id}`;
   function messageId(value) {
     const [s, n, extra] = String(value).split(':');
-    if (s !== session || extra || !/^[1-9]\d*$/.test(n)) throw new Error('Riferimento scaduto: ripetere la ricerca dopo il riavvio di Thunderbird.');
+    if (s !== session || extra || !/^[1-9]\d*$/.test(n)) throw new Error('Expired reference: search again after restarting Thunderbird.');
     return Number(n);
   }
   function text(value, max = 500, required = false) {
     if (value === undefined && !required) return undefined;
-    if (typeof value !== 'string' || value.length > max || (required && !value.trim())) throw new Error('Testo mancante o troppo lungo.');
+    if (typeof value !== 'string' || value.length > max || (required && !value.trim())) throw new Error('Missing or oversized text.');
     return value;
   }
   function integer(value, fallback, min, max) {
     if (value === undefined) return fallback;
-    if (!Number.isInteger(value) || value < min || value > max) throw new Error('Limite numerico non valido.');
+    if (!Number.isInteger(value) || value < min || value > max) throw new Error('Invalid numeric limit.');
     return value;
   }
   function summary(m) {
@@ -56,10 +56,10 @@
     if (typeof args.unread === 'boolean') query.read = !args.unread;
     const start = args.since || (args.all_time ? undefined : new Date(Date.now() - 90*86400000).toISOString());
     for (const [v, key] of [[start,'fromDate'],[args.before,'toDate']]) {
-      if (v) { const d = new Date(v); if (!Number.isFinite(d.getTime())) throw new Error('Data non valida.'); query[key] = d; }
+      if (v) { const d = new Date(v); if (!Number.isFinite(d.getTime())) throw new Error('Invalid date.'); query[key] = d; }
     }
     const person = text(args.person);
-    if (person && (query.author || query.recipients)) throw new Error('Usare person oppure author/recipient.');
+    if (person && (query.author || query.recipients)) throw new Error('Use person or author/recipient.');
     const queries = person ? [{...query, author:person},{...query, recipients:person}] : [query];
     const found = new Map();
     let scanned = 0, incomplete = false;
@@ -86,7 +86,7 @@
     }
     return {searched_since:query.fromDate?.toISOString() || null, searched_before:query.toDate?.toISOString() || null,
       search_incomplete:incomplete, more_matches:unique.length>limit, matched_unique:unique.length,
-      note:incomplete?'Risultati parziali: restringere account, date o parole. Non affermare di avere trovato gli ultimi messaggi in assoluto.':'Ricerca nel database locale di Thunderbird; i messaggi non sincronizzati potrebbero non essere ricercabili nel corpo.',
+      note:incomplete?'Partial results: narrow the account, dates or keywords. Do not claim these are the latest messages overall.':'Searching the local Thunderbird database; unsynchronized message bodies may not be searchable.',
       messages:unique.slice(0,limit).map(summary)};
   }
   async function read(args) {
@@ -111,7 +111,7 @@
     if (method === 'send_reply') return TBOutbound.send(args,'reply');
     if (method === 'send_draft') return TBOutbound.send(args,'new');
     if (method === 'extension_status') return {version:'1.4.0',...(await TBPolicy.status()),session,thunderbird:(await messenger.runtime.getBrowserInfo()).version,capabilities:['read','search','new_draft','native_reply_draft','full_reply_history','account_format_and_signature','file_attachments','download_attachment']};
-    throw new Error('Operazione non supportata.');
+    throw new Error('Unsupported operation.');
   }
   globalThis.TBDirect = {handle,compact,messageId,summary};
 })();

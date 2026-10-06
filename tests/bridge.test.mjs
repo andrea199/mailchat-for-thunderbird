@@ -19,7 +19,7 @@ test('HTTP broker blocks sends by default and after local revocation',async()=>{
   const rpc=post('/rpc',a);const next=await (await post('/next',{},c.addonToken)).json();assert.equal(next.method,'send_draft');
   await post('/result',{id:next.id,ok:true,data:{sent:true}},c.addonToken);assert.equal((await rpc).status,200);
   policy={mode:'drafts'};assert.equal((await post('/rpc',a)).status,403);
-  await assert.rejects(callTool({...c,mode:'drafts'},'thunderbird_send_reply',a.args),/disabilitato/);
+  await assert.rejects(callTool({...c,mode:'drafts'},'thunderbird_send_reply',a.args),/disabled/);
   assert.throws(()=>validate(tools.find(t=>t.name==='thunderbird_send_draft').inputSchema,{...a.args,approved:true}),/unsupported/);
  }finally{b.close();}
 });

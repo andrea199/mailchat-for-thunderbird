@@ -39,7 +39,7 @@ const receipt=await ctx.TBReplies.prepare(args);assert.equal(receipt.saved,true)
 assert.ok(composeDetails.get(10).plainTextBody.endsWith('END_OF_OLD_EMAIL'));
 await ctx.TBReplies.prepare(args);assert.equal(beginCalls,1);assert.equal(saveCalls,1);
 headers[3].references=['<missing@example.com>'];
-await assert.rejects(ctx.TBReplies.prepare({...args,request_id:'missing-history-request'}),/Storico incompleto/);assert.equal(beginCalls,1);
+await assert.rejects(ctx.TBReplies.prepare({...args,request_id:'missing-history-request'}),/Incomplete history/);assert.equal(beginCalls,1);
 headers[3].references=['<middle@example.com>'];headers[1].references=['<latest@example.com>'];
 const cycle=await ctx.TBHistory.collect(messages[2]);assert.equal(cycle.info.message_count,3);
-console.log('PASS: messaggi storici oltre 90 giorni, deduplicazione, ordine, testo completo oltre 24k, citazione e firma, escaping HTML, verifica contenuto, bozza nativa e riuso senza duplicati, errore prima della bozza se storico mancante, cicli RFC.');
+console.log('PASS: complete RFC history, old messages, deduplication, HTML escaping, signature, draft idempotency and missing-history failure.');

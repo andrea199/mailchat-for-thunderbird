@@ -24,15 +24,15 @@ test('preparing never sends; draft mode and missing permission block sending',as
  const f=await fixture(),receipt=await f.ctx.TBOutbound.prepareNew(f.args);
  assert.equal(receipt.sent,false);assert.equal(f.counts().sent,0);
  const send={request_id:f.args.request_id,review_hash:receipt.review_hash};
- await assert.rejects(f.ctx.TBOutbound.send(send,'new'),/disabilitato/);
- f.enable();f.denyPermission();await assert.rejects(f.ctx.TBOutbound.send(send,'new'),/disabilitato/);
+ await assert.rejects(f.ctx.TBOutbound.send(send,'new'),/disabled/);
+ f.enable();f.denyPermission();await assert.rejects(f.ctx.TBOutbound.send(send,'new'),/disabled/);
  f.enable();const r=await f.ctx.TBOutbound.send(send,'new');assert.equal(r.sent,true);
  await f.ctx.TBOutbound.send(send,'new');assert.equal(f.counts().sent,1);
 });
 test('changed content or recipient cannot be sent',async()=>{
  const f=await fixture(),r=await f.ctx.TBOutbound.prepareNew(f.args);f.enable();
  f.drafts.get(10).to=['attacker@example.com'];
- await assert.rejects(f.ctx.TBOutbound.send({request_id:f.args.request_id,review_hash:r.review_hash},'new'),/modificata/);assert.equal(f.counts().sent,0);
+ await assert.rejects(f.ctx.TBOutbound.send({request_id:f.args.request_id,review_hash:r.review_hash},'new'),/changed/);assert.equal(f.counts().sent,0);
 });
 test('native boundary rechecks revocation',async()=>{
  const f=await fixture(),r=await f.ctx.TBOutbound.prepareNew(f.args);f.enable();f.setRevoke();
@@ -40,7 +40,7 @@ test('native boundary rechecks revocation',async()=>{
 });
 test('uncertain outcome is never sent twice',async()=>{
  const f=await fixture(),r=await f.ctx.TBOutbound.prepareNew(f.args);f.enable();f.setUncertain();const a={request_id:f.args.request_id,review_hash:r.review_hash};
- await assert.rejects(f.ctx.TBOutbound.send(a,'new'),/uncertain/);await assert.rejects(f.ctx.TBOutbound.send(a,'new'),/incerto/);assert.equal(f.counts().sent,1);
+ await assert.rejects(f.ctx.TBOutbound.send(a,'new'),/uncertain/);await assert.rejects(f.ctx.TBOutbound.send(a,'new'),/uncertain/);assert.equal(f.counts().sent,1);
 });
 test('reply retains history and can send only after explicit enabling',async()=>{
  const f=await fixture(),a={...f.args,request_id:'reply-message-test',ref:'ref',expected_message_id:'parent@example.com'};

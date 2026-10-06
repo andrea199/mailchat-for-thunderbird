@@ -48,7 +48,7 @@ function validateWire(method,args){
   let schema=tool?.inputSchema||obj();
   if(['create_draft','prepare_reply'].includes(method))schema={...schema,properties:{...schema.properties,attachments:{type:'array',maxItems:10,items:wireFile}}};
   validate(schema,args);
-  if(args.attachments){let total=0;for(const file of args.attachments){total+=file.size;if(total>MAX_TOTAL)throw new Error('Allegati oltre 25 MiB.');decodeFile(file);}}
+  if(args.attachments){let total=0;for(const file of args.attachments){total+=file.size;if(total>MAX_TOTAL)throw new Error('Attachments exceed 25 MiB.');decodeFile(file);}}
 }
 
 function validate(schema,value,where='arguments') {
@@ -111,11 +111,11 @@ export async function startBroker(config,{idleMs=1800000,loadPolicy=async()=>con
         return json(res,200,{accepted:!!p});
       }
       if(!METHOD_NAMES.has(data.method))return json(res,400,{error:'Operation not allowed'});
-      if(isSending(data.method)&&!autoAllowed(policy))return json(res,403,{error:'Invio disabilitato dalla scelta locale dell’utente.'});
+      if(isSending(data.method)&&!autoAllowed(policy))return json(res,403,{error:'Sending is disabled by the local user setting.'});
       validateWire(data.method,data.args||{});
       if(pending.size>=12)return json(res,429,{error:'Too many pending requests'});
       const id=randomUUID();
-      const entry={res,timer:setTimeout(()=>{pending.delete(id);json(res,504,{ok:false,error:['create_draft','prepare_reply','send_reply','send_draft'].includes(data.method)?'Esito incerto. Non ripetere con un nuovo request_id: controllare Bozze, Posta inviata e Posta in uscita.':'Thunderbird non risponde. Aprire Thunderbird e verificare che MailChat for Thunderbird sia attivo.'});},115000)};
+      const entry={res,timer:setTimeout(()=>{pending.delete(id);json(res,504,{ok:false,error:['create_draft','prepare_reply','send_reply','send_draft'].includes(data.method)?'Uncertain outcome. Do not retry with a new request_id: inspect Drafts, Sent and Outbox.':'Thunderbird is not responding. Open Thunderbird and check that MailChat is enabled.'});},115000)};
       pending.set(id,entry);queue.push({id,method:data.method,args:data.args||{}});deliver();
       res.on('close',()=>{if(pending.get(id)===entry){clearTimeout(entry.timer);pending.delete(id);}});
     } catch(e) {json(res,400,{error:e.message});}
@@ -133,27 +133,27 @@ async function ensureBroker(config,configPath) {
   try{const s=await api(config,'/health');if(s.service==='mailchat-for-thunderbird')return;}catch{}
   const child=spawn(process.execPath,[fileURLToPath(import.meta.url),'--broker','--config',configPath],{cwd:HERE,detached:true,windowsHide:true,stdio:'ignore'});child.on('error',()=>{});child.unref();
   for(let n=0;n<30;n++){await new Promise(r=>setTimeout(r,150));try{const s=await api(config,'/health');if(s.service==='mailchat-for-thunderbird')return;}catch{}}
-  throw new Error('Impossibile avviare il collegamento locale: controllare Node.js e la porta configurata.');
+  throw new Error('Cannot start the local bridge: check Node.js and the configured port.');
 }
 export async function callTool(config,name,args,{attachmentDirectory=path.join(HERE,'attachments','received')}={}) {
-  if(isSending(name)&&!autoAllowed(config))throw new Error('Invio disabilitato dalla scelta locale dell’utente.');
+  if(isSending(name)&&!autoAllowed(config))throw new Error('Sending is disabled by the local user setting.');
   const tool=tools.find(t=>t.name===name);if(!tool)throw new Error('Unknown tool');validate(tool.inputSchema,args);
   if(name==='thunderbird_inspect_attachment')return {...(await loadLocalFile(args.path)).metadata,inspected:true};
   let state=await api(config,'/health');
   if(name==='thunderbird_status'){
-    if(!state.addon_connected)return {...state,instructions:'Installare l’XPI MailChat for Thunderbird e lasciare Thunderbird aperto.'};
+    if(!state.addon_connected)return {...state,instructions:'Install the MailChat XPI and leave Thunderbird open.'};
     const ext=await api(config,'/rpc',{method:'extension_status',args:{}});
-    return {...state,extension:ext.ok?ext.data:null,instructions:'Collegamento locale condiviso tra le chat. Firma e formato dell’account richiedono estensione 1.4.0. Riavviare Codex dopo aggiornamenti per ricaricare gli strumenti nelle chat aperte e nuove.'};
+    return {...state,extension:ext.ok?ext.data:null,instructions:'The local bridge is shared across chats. Account format and signature require extension 1.4.0. Restart Codex after updates to reload tools in existing and new chats.'};
   }
   for(let i=0;!state.addon_connected&&i<8;i++){await new Promise(r=>setTimeout(r,1000));state=await api(config,'/health');}
-  if(!state.addon_connected)throw new Error('Estensione non collegata. Installare l’XPI MailChat for Thunderbird e lasciare Thunderbird aperto.');
-  if(isSending(name)){const ext=await api(config,'/rpc',{method:'extension_status',args:{}});if(!ext.ok||ext.data?.mode!=='autonomous'||!ext.data?.send_permission)throw new Error('Abilitare l’invio automatico personalmente nelle impostazioni Thunderbird.');}
-  if(name==='thunderbird_prepare_reply'){const ext=await api(config,'/rpc',{method:'extension_status',args:{}});if(!ext.ok||!ext.data?.capabilities?.includes('full_reply_history'))throw new Error('Installare MailChat for Thunderbird 1.4.0 per includere lo storico completo nelle risposte.');}
+  if(!state.addon_connected)throw new Error('Extension is not connected. Install the MailChat XPI and leave Thunderbird open.');
+  if(isSending(name)){const ext=await api(config,'/rpc',{method:'extension_status',args:{}});if(!ext.ok||ext.data?.mode!=='autonomous'||!ext.data?.send_permission)throw new Error('Enable autonomous sending personally in Thunderbird settings.');}
+  if(name==='thunderbird_prepare_reply'){const ext=await api(config,'/rpc',{method:'extension_status',args:{}});if(!ext.ok||!ext.data?.capabilities?.includes('full_reply_history'))throw new Error('Install MailChat 1.4.0 to include full history in replies.');}
   const fileOperation=name==='thunderbird_download_attachment'||(args.attachments?.length>0);
   if(fileOperation){
-    if(!['1.4.0'].includes(state.version))throw new Error('Ricaricare il collegamento locale per attivare gli allegati.');
+    if(!['1.4.0'].includes(state.version))throw new Error('Restart the local bridge to enable attachments.');
     const ext=await api(config,'/rpc',{method:'extension_status',args:{}});
-    if(!ext.ok||!ext.data?.capabilities?.includes('file_attachments'))throw new Error('Installare MailChat for Thunderbird 1.4.0 per gestire gli allegati.');
+    if(!ext.ok||!ext.data?.capabilities?.includes('file_attachments'))throw new Error('Install MailChat 1.4.0 for attachment support.');
   }
   const transferred=args.attachments?{...args,attachments:await outgoingFiles(args.attachments)}:args;
   const result=await api(config,'/rpc',{method:name.slice('thunderbird_'.length),args:transferred});

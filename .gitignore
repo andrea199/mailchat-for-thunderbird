@@ -2,7 +2,7 @@ node_modules/
 dist/
 .test-artifacts/
 connection.json
-Collegamento.txt
+Pairing-Key.txt
 installation.json
 attachments/
 *.bak

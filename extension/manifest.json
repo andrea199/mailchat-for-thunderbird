@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "MailChat for Thunderbird",
   "version": "1.4.0",
-  "description": "Collega Thunderbird alle chat locali di Codex. Solo bozze per impostazione predefinita; invio automatico facoltativo.",
+  "description": "Connect Thunderbird to local Codex chats. Drafts by default; optional autonomous sending.",
   "browser_specific_settings": {
     "gecko": {
       "id": "mailchat-for-thunderbird@andrea199.github.io",

@@ -8,7 +8,7 @@ The extension accesses account identities, message metadata, selected message bo
 
 Outgoing local files are read only from supplied paths, verified by SHA-256 and transferred through the bridge for attachment to drafts. Selected received attachments are saved under the installation's private local attachment directory. The chat can subsequently read those local files with its own tools. Mail sent or drafts saved are also processed by your configured mail provider.
 
-The extension stores a local pairing key, mode and consent choice in Thunderbird storage, together with draft verification records and sending receipts. The Windows installer stores two random authentication keys, mode and port in `connection.json` and prints the extension key in `Collegamento.txt`. Keep the installed folder private and out of shared/cloud folders. MailChat does not bundle your passwords or an AI API key.
+The extension stores a local pairing key, mode and consent choice in Thunderbird storage, together with draft verification records and sending receipts. The Windows installer stores two random authentication keys, mode and port in `connection.json` and prints the extension key in `Pairing-Key.txt`. Keep the installed folder private and out of shared/cloud folders. MailChat does not bundle your passwords or an AI API key.
 
 ## Consent and sending
 

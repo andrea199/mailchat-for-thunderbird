@@ -19,9 +19,9 @@ Connect Thunderbird to local Codex chats on your Windows PC. Search and read mai
 
 1. Download `MailChat-Windows-1.4.0.zip` from [Releases](https://github.com/andrea199/mailchat-for-thunderbird/releases). Extract the ZIP first.
 2. Install Node.js 22 or later from [nodejs.org](https://nodejs.org/en/download) if it is missing. Install Thunderbird 153+ and configure your mail account. Install Codex desktop and sign in.
-3. Run `Installa.cmd`. Choose **1 — Drafts only** or **2 — Autonomous sending**. Choice 2 also asks you to type `INVIO AUTOMATICO`.
+3. Run `Install.cmd`. Choose **1 — Drafts only** or **2 — Autonomous sending**. Choice 2 also asks you to type `AUTONOMOUS SENDING`.
 4. The installer prints a folder under `%LOCALAPPDATA%\MailChat`. In Thunderbird, open **Add-ons and Themes → gear → Install Add-on From File** and select `MailChat-for-Thunderbird-1.4.0.xpi` in that folder.
-5. Open MailChat settings. Copy the local key from `Collegamento.txt`, read and accept the data-sharing consent, and save. Never share that key or the installed folder. Each person runs their own installer and receives different keys.
+5. Open MailChat settings. Copy the local key from `Pairing-Key.txt`, read and accept the data-sharing consent, and save. Never share that key or the installed folder. Each person runs their own installer and receives different keys.
 6. For autonomous sending, also select that mode in Thunderbird, tick its confirmation and grant the optional sending permission. Both sides must be enabled.
 7. Completely close and reopen Codex. Leave Thunderbird open. Ask the chat to check the MailChat/Thunderbird connection, then start with a draft.
 

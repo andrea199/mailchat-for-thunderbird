@@ -1,14 +1,14 @@
-# Pubblicazione sul portale Thunderbird
+# Publishing on the Thunderbird add-ons portal
 
-1. Accedi al [Developer Hub](https://addons.thunderbird.net/developers/) e avvia l'invio di un nuovo componente aggiuntivo, scegliendo la pubblicazione sul portale.
-2. Carica **dist/MailChat-for-Thunderbird-1.4.0.xpi**. Non caricare il pacchetto Windows come estensione. Il manifest richiede Thunderbird 153 o superiore.
-3. Nome: **MailChat for Thunderbird**. Riassunto: **Collega Thunderbird alle chat locali di Codex: ricerca email, allegati, bozze e risposte con storico. Invio automatico facoltativo.**
-4. Descrizione: **MailChat collega Thunderbird e Codex sullo stesso PC Windows tramite un ponte locale autenticato. Permette di cercare e leggere email, scaricare allegati e preparare bozze con firma e storico delle risposte. La modalità predefinita non può inviare: l'utente controlla e invia da Thunderbird. La modalità autonoma va attivata esplicitamente nell'installer e nelle impostazioni dell'estensione, concedendo il permesso facoltativo di invio. Richiede Thunderbird 153+, Node.js 22+, Codex desktop e il pacchetto Windows disponibile su GitHub. I dati letti dalla chat possono essere elaborati dal servizio AI utilizzato da Codex. Progetto indipendente, versione beta.**
-5. Icona: **assets/icon-128.png**. Licenza: **MIT**. Homepage: https://github.com/andrea199/mailchat-for-thunderbird . Supporto: https://github.com/andrea199/mailchat-for-thunderbird/issues . Informativa privacy: https://github.com/andrea199/mailchat-for-thunderbird/blob/main/PRIVACY.md .
-6. Se vengono richiesti i sorgenti, carica **dist/MailChat-Source-1.4.0.zip**. Nelle note per i revisori incolla il contenuto di **docs/REVIEWER-NOTES.md**. Il codice è leggibile, non minificato, senza dipendenze runtime nell'estensione.
-7. Prima di inviare, prova entrambe le modalità in un profilo Thunderbird pulito con account di prova. Aggiungi screenshot reali delle impostazioni, senza la chiave visibile. Controlla e risolvi gli errori del validatore del portale. Non dichiarare completati test che non hai eseguito.
-8. Invia alla revisione. L'approvazione e la visibilità sul catalogo dipendono dai revisori Thunderbird. Il caricamento su GitHub non equivale alla pubblicazione nel catalogo.
+1. Sign in to the [Developer Hub](https://addons.thunderbird.net/developers/), submit a new add-on and choose listing on the portal.
+2. Upload **dist/MailChat-for-Thunderbird-1.4.0.xpi**. Do not upload the Windows ZIP as the extension. The manifest requires Thunderbird 153 or later.
+3. Name: **MailChat for Thunderbird**. Summary: **Connect Thunderbird to local Codex chats: email search, attachments, drafts and replies with history. Optional autonomous sending.**
+4. Description: **MailChat connects Thunderbird and Codex on the same Windows PC through an authenticated local bridge. Search and read messages, download attachments and prepare drafts with your account signature and reply history. The default mode cannot send: you review and send in Thunderbird. Autonomous mode must be enabled explicitly in both the installer and extension settings, with the optional send permission. Requires Thunderbird 153+, Node.js 22+, Codex desktop and the Windows package available on GitHub. Data read by the chat may be processed by the AI service used by Codex. Independent project, beta release.**
+5. Icon: **assets/icon-128.png**. License: **MIT**. Homepage: https://github.com/andrea199/mailchat-for-thunderbird . Support: https://github.com/andrea199/mailchat-for-thunderbird/issues . Privacy notice: https://github.com/andrea199/mailchat-for-thunderbird/blob/main/PRIVACY.md .
+6. If source code is requested, upload **dist/MailChat-Source-1.4.0.zip**. Paste **docs/REVIEWER-NOTES.md** into the reviewer notes. The JavaScript is readable, unminified and has no runtime extension dependencies.
+7. Before submission, test both modes in a clean Thunderbird profile with a test mail account. Add real screenshots of settings with the pairing key hidden. Fix portal validator errors. Do not claim tests were completed unless you ran them.
+8. Submit for review. Approval and catalog visibility depend on Thunderbird's reviewers. Publishing on GitHub does not publish the extension in the Thunderbird catalog.
 
-Per Riccardo e Luca condividi il link alla release GitHub e il **ZIP Windows**. Ognuno deve estrarlo ed eseguire il proprio installer: non condividere cartelle installate, `connection.json` o `Collegamento.txt`.
+For beta testers, share the GitHub release link and the **Windows ZIP**. Each person must extract it and run their own installer. Never share installed folders, connection.json or Pairing-Key.txt.
 
-Riferimenti ufficiali: https://developer.thunderbird.net/add-ons/mailextensions e https://thunderbird.github.io/atn-review-policy/ .
+Official references: https://developer.thunderbird.net/add-ons/mailextensions and https://thunderbird.github.io/atn-review-policy/ .
