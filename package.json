@@ -5,6 +5,6 @@
   "type": "module",
   "description": "Local Thunderbird integration for Codex chats with opt-in autonomous sending",
   "license": "MIT",
-  "scripts": {"build": "node scripts/build.mjs", "test": "node --test tests/*.test.mjs"},
+  "scripts": {"build": "node scripts/build.mjs", "pretest": "node scripts/build.mjs", "test": "node --test tests/*.test.mjs"},
   "engines": {"node": ">=22"}
 }
