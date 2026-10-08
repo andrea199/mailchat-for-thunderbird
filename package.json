@@ -1,6 +1,6 @@
 {
   "name": "mailchat-for-thunderbird",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "private": true,
   "type": "module",
   "description": "Local Thunderbird integration for Codex chats with opt-in autonomous sending",

@@ -27,12 +27,12 @@ export async function install({root,codexHome,mode='drafts'}={}){
  connection.mode=mode;
  // Read every required artifact first, so missing downloads do not change user config.
  const artifacts=await Promise.all(['bridge.mjs','files.mjs'].map(name=>readFile(path.join(PROJECT,'bridge',name))));
- const xpi=await readFile(path.join(PROJECT,'dist','MailChat-for-Thunderbird-1.4.0.xpi'));
+ const xpi=await readFile(path.join(PROJECT,'dist','MailChat-for-Thunderbird-1.4.1.xpi'));
  await mkdir(root,{recursive:true});
  await writeFile(path.join(root,'installation.json'),JSON.stringify({project:'mailchat-for-thunderbird',codexHome}));
  for(const [i,name] of ['bridge.mjs','files.mjs'].entries())await writeFile(path.join(root,name),artifacts[i]);
  const configTemp=personal+'.tmp';await writeFile(configTemp,JSON.stringify(connection,null,2));await rename(configTemp,personal);
- await writeFile(path.join(root,'MailChat-for-Thunderbird-1.4.0.xpi'),xpi);
+ await writeFile(path.join(root,'MailChat-for-Thunderbird-1.4.1.xpi'),xpi);
  await writeFile(path.join(root,'Pairing-Key.txt'),'MAILCHAT — LOCAL KEY, DO NOT SHARE\r\nOpen MailChat settings in Thunderbird and paste this key:\r\n\r\n'+connection.addonToken+'\r\n\r\nSelected bridge mode: '+mode+'\r\n');
  const block=`${BEGIN}\n[mcp_servers.mailchat]\ncommand = ${JSON.stringify(process.execPath)}\nargs = [${JSON.stringify(path.join(root,'bridge.mjs'))}]\n${END}`;
  const updated=start>=0?old.slice(0,start)+block+old.slice(end+END.length):old+'\n'+block+'\n';
@@ -40,7 +40,7 @@ export async function install({root,codexHome,mode='drafts'}={}){
  if(old!==updated){if(await exists(configPath))await copyFile(configPath,configPath+'.before-mailchat-'+Date.now()+'.bak');const tmp=configPath+'.mailchat.tmp';await writeFile(tmp,updated);await rename(tmp,configPath);}
  await writeFile(path.join(root,'Check-Connection.cmd'),`@echo off\r\n"${process.execPath}" "%~dp0bridge.mjs" --doctor\r\npause\r\n`);
  console.log('Installation complete. Bridge mode: '+(mode==='autonomous'?'AUTONOMOUS SENDING':'DRAFTS ONLY'));
- console.log('Install in Thunderbird: '+path.join(root,'MailChat-for-Thunderbird-1.4.0.xpi'));
+ console.log('Install in Thunderbird: '+path.join(root,'MailChat-for-Thunderbird-1.4.1.xpi'));
  console.log('Open Pairing-Key.txt in the same folder and copy the key into the extension settings.');
  console.log('Accept the data-sharing notice. Autonomous sending ALSO requires enabling the mode and permission in Thunderbird settings.');
  console.log('Completely restart Codex. Do not share this folder or its key.');

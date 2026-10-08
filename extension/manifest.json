@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "MailChat for Thunderbird",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Connect Thunderbird to local Codex chats. Drafts by default; optional autonomous sending.",
   "browser_specific_settings": {
     "gecko": {
@@ -26,6 +26,7 @@
       "history.js",
       "replies.js",
       "outbound.js",
+      "drafts.js",
       "background.js"
     ],
     "persistent": true

@@ -1,4 +1,4 @@
-# Reviewer notes — MailChat 1.4.0 beta
+# Reviewer notes — MailChat 1.4.1 beta
 
 This is an independent Thunderbird MailExtension paired with a local Node.js MCP bridge for Codex desktop on Windows. No paid developer site, hosted MailChat service, API credentials or private account data are required by this project. Codex itself requires its own account. The XPI alone does not provide the local bridge.
 
@@ -11,3 +11,5 @@ Drafts-only exposes no MCP send tools, rejects send RPCs in the bridge and has n
 Required permissions provide account identities/signatures, message searching/reading, selected attachment access, draft composition and local settings. compose.send is optional. Authenticated HTTP is restricted to fixed localhost 127.0.0.1:37629. Host and browser Origin checks plus distinct random client/add-on tokens are used. Pairing/consent is mandatory. Mail contents returned to Codex may be processed by its AI provider; notice and user consent are in the options page and PRIVACY.md. The project runs no cloud mail endpoint or telemetry.
 
 This release has automated mock/HTTP/installer tests; real Thunderbird/Codex end-to-end validation remains a beta testing requirement. It is not represented as already reviewed or approved by ATN.
+
+Version 1.4.1 adds list/read/update tools for existing open composers. Double-click a saved draft in Thunderbird first, then use list_drafts, read_draft and update_draft with the returned hash. Verify plain-text and HTML replacements, signature and quotation retention, unchanged attachments/Bcc/thread headers, and rejection after manual edits. Updates use setComposeDetails and saveMessage on the original tab; beginNew/EditAsNew is never used. Public APIs do not reopen closed saved drafts for in-place editing. No new permissions or Experiment APIs are requested. Updated drafts are sent manually; old automated send verification fails when content changes.

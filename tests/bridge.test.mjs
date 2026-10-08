@@ -23,11 +23,11 @@ test('HTTP broker blocks sends by default and after local revocation',async()=>{
   assert.throws(()=>validate(tools.find(t=>t.name==='thunderbird_send_draft').inputSchema,{...a.args,approved:true}),/unsupported/);
  }finally{b.close();}
 });
-test('MCP lists only eight draft tools by default; ten when installer allows sending',async()=>{
+test('MCP lists eleven draft tools by default; thirteen when installer allows sending',async()=>{
  const root=path.join(tmpdir(),'mailchat-test-'+randomBytes(6).toString('hex'));await mkdir(root);
  try{for(const mode of ['drafts','autonomous']){
   const config=path.join(root,'connection.json');await writeFile(config,JSON.stringify({port:37629,mode,clientToken:randomBytes(32).toString('hex'),addonToken:randomBytes(32).toString('hex')}));
   const result=await new Promise((resolve,reject)=>{const child=spawn(process.execPath,[fileURLToPath(new URL('../bridge/bridge.mjs',import.meta.url)),'--config',config],{windowsHide:true});let out='',err='';child.stdout.on('data',b=>out+=b);child.stderr.on('data',b=>err+=b);child.on('error',reject);child.on('exit',code=>code?reject(Error(err)):resolve(JSON.parse(out).result));child.stdin.end(JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/list'})+'\n');});
-  assert.equal(result.tools.length,mode==='drafts'?8:10);
+  assert.equal(result.tools.length,mode==='drafts'?11:13);
  }}finally{await rm(root,{recursive:true,force:true});}
 });
