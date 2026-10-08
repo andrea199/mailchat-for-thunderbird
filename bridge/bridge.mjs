@@ -1,4 +1,4 @@
-﻿import http from 'node:http';
+import http from 'node:http';
 import {randomUUID, timingSafeEqual} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
 import {spawn} from 'node:child_process';
@@ -195,4 +195,3 @@ async function main(){
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url))main().catch(e=>{process.stderr.write(e.message+'\n');process.exitCode=1;});
 export {tools,validate};
-
