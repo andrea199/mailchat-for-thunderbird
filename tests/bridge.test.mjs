@@ -23,6 +23,34 @@ test('HTTP broker blocks sends by default and after local revocation',async()=>{
   assert.throws(()=>validate(tools.find(t=>t.name==='thunderbird_send_draft').inputSchema,{...a.args,approved:true}),/unsupported/);
  }finally{b.close();}
 });
+test('Thunderbird heartbeat keeps an otherwise idle broker alive',async()=>{
+ const c={port:0,clientToken:randomBytes(32).toString('hex'),addonToken:randomBytes(32).toString('hex')};
+ const b=await startBroker(c,{idleMs:80,idleCheckMs:10});const base='http://127.0.0.1:'+b.server.address().port;
+ const controller=new AbortController();
+ try{
+  await new Promise(r=>setTimeout(r,50));
+  const heartbeat=fetch(base+'/next',{method:'POST',headers:{Authorization:'Bearer '+c.addonToken,'Content-Type':'application/json'},body:'{}',signal:controller.signal}).catch(()=>{});
+  await new Promise(r=>setTimeout(r,50));
+  assert.equal(b.server.listening,true);
+  controller.abort();await heartbeat;
+ }finally{b.close();}
+});
+test('status waits for a delayed Thunderbird reconnection',async()=>{
+ const c={port:0,clientToken:randomBytes(32).toString('hex'),addonToken:randomBytes(32).toString('hex'),mode:'drafts'};
+ const b=await startBroker(c);c.port=b.server.address().port;const base='http://127.0.0.1:'+c.port;
+ const post=(endpoint,data)=>fetch(base+endpoint,{method:'POST',headers:{Authorization:'Bearer '+c.addonToken,'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json());
+ const extension=(async()=>{
+  await new Promise(r=>setTimeout(r,100));
+  const request=await post('/next',{});
+  assert.equal(request.method,'extension_status');
+  await post('/result',{id:request.id,ok:true,data:{version:'1.4.1',capabilities:[]}});
+ })();
+ try{
+  const status=await callTool(c,'thunderbird_status',{});
+  assert.equal(status.addon_connected,true);assert.equal(status.extension.version,'1.4.1');
+  await extension;
+ }finally{b.close();}
+});
 test('MCP lists eleven draft tools by default; thirteen when installer allows sending',async()=>{
  const root=path.join(tmpdir(),'mailchat-test-'+randomBytes(6).toString('hex'));await mkdir(root);
  try{for(const mode of ['drafts','autonomous']){

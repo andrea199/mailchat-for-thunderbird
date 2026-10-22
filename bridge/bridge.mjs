@@ -79,8 +79,8 @@ async function body(req,maxBytes=524288) {
   for await(const chunk of req){size+=chunk.length;if(size>maxBytes)throw new Error('Request too large');chunks.push(chunk);}
   return JSON.parse(Buffer.concat(chunks).toString('utf8')||'{}');
 }
-export async function startBroker(config,{idleMs=1800000,loadPolicy=async()=>config}={}) {
-  const pending=new Map();const queue=[];let waiter=null,lastSeen=0,lastClient=Date.now();
+export async function startBroker(config,{idleMs=1800000,idleCheckMs=30000,loadPolicy=async()=>config}={}) {
+  const pending=new Map();const queue=[];let waiter=null,lastSeen=0,lastActivity=Date.now();
   function deliver() {
     while(queue.length&&!pending.has(queue[0].id))queue.shift();
     if(waiter&&queue.length){const w=waiter;waiter=null;clearTimeout(w.timer);json(w.res,200,queue.shift());}
@@ -95,9 +95,12 @@ export async function startBroker(config,{idleMs=1800000,loadPolicy=async()=>con
       if(!client&&!addon)return json(res,404,{error:'Unknown endpoint'});
       if(req.headers.origin && (client||!req.headers.origin.startsWith('moz-extension://')))return json(res,403,{error:'Browser origin blocked'});
       if(!authorized(req,client?config.clientToken:config.addonToken))return json(res,401,{error:'Unauthorized'});
-      if(client)lastClient=Date.now();
+      // Thunderbird keeps a long-poll open on /next. Treat that authenticated
+      // heartbeat as activity too, otherwise the broker shuts down after the
+      // client idle timeout even while the extension is healthy and connected.
+      lastActivity=Date.now();
       const policy=await loadPolicy();
-      if(endpoint==='/health'&&req.method==='GET')return json(res,200,{service:'mailchat-for-thunderbird',version:'1.4.1',draft_only:!autoAllowed(policy),mode:autoAllowed(policy)?'autonomous':'drafts',addon_connected:Date.now()-lastSeen<40000,pending:pending.size});
+      if(endpoint==='/health'&&req.method==='GET')return json(res,200,{service:'mailchat-for-thunderbird',version:'1.4.1',draft_only:!autoAllowed(policy),mode:autoAllowed(policy)?'autonomous':'drafts',addon_connected:Date.now()-lastSeen<40000,addon_last_seen_ms:lastSeen?Date.now()-lastSeen:null,pending:pending.size});
       if(req.method!=='POST')return json(res,405,{error:'Method not allowed'});
       const data=await body(req,['/rpc','/result'].includes(endpoint)?MAX_PACKET:524288);
       if(endpoint==='/next') {
@@ -124,7 +127,7 @@ export async function startBroker(config,{idleMs=1800000,loadPolicy=async()=>con
     } catch(e) {json(res,400,{error:e.message});}
   });
   await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(config.port,'127.0.0.1',resolve);});
-  const idle=setInterval(()=>{if(!pending.size&&Date.now()-lastClient>idleMs)close();},30000);idle.unref();
+  const idle=setInterval(()=>{if(!pending.size&&Date.now()-lastActivity>idleMs)close();},idleCheckMs);idle.unref();
   function close(){clearInterval(idle);if(waiter){clearTimeout(waiter.timer);json(waiter.res,200,{});waiter=null;}for(const p of pending.values()){clearTimeout(p.timer);json(p.res,503,{error:'Broker closed'});}pending.clear();server.close();server.closeAllConnections();}
   return {server,close};
 }
@@ -144,7 +147,11 @@ export async function callTool(config,name,args,{attachmentDirectory=path.join(H
   if(name==='thunderbird_inspect_attachment')return {...(await loadLocalFile(args.path)).metadata,inspected:true};
   let state=await api(config,'/health');
   if(name==='thunderbird_status'){
-    if(!state.addon_connected)return {...state,instructions:'Install the MailChat XPI and leave Thunderbird open.'};
+    // A broker may have just been restarted after an idle period. The
+    // extension retries every five seconds, so allow it to reconnect before
+    // reporting a failure to the chat.
+    for(let i=0;!state.addon_connected&&i<8;i++){await new Promise(r=>setTimeout(r,1000));state=await api(config,'/health');}
+    if(!state.addon_connected)return {...state,instructions:'MailChat did not reconnect within 8 seconds. Check that the extension is enabled, paired and allowed to share data, then verify that no older Thunderbird Direct integration is using port 37629.'};
     const ext=await api(config,'/rpc',{method:'extension_status',args:{}});
     return {...state,extension:ext.ok?ext.data:null,instructions:'The local bridge is shared across chats. Account format and signature require extension 1.4.1. Restart Codex after updates to reload tools in existing and new chats.'};
   }
