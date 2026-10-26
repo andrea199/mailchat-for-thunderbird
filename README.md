@@ -4,7 +4,7 @@
 
 Connect Thunderbird to local Codex chats on your Windows PC. Search and read mail, download selected attachments, prepare new messages and replies with your account signature and conversation history.
 
-**Public beta 1.4.1 — Windows, Node.js 22+, Thunderbird 153+, Codex desktop with local MCP support.** End-to-end testing in a clean Thunderbird profile is still required before a stable release. This is an independent community project, not an official Thunderbird or OpenAI product. There is no hosted service or API key bundled with MailChat. Your chat service may require its own account or subscription.
+**Public beta 1.4.2 — Windows, Node.js 22+, Thunderbird 153+, Codex desktop with local MCP support.** End-to-end testing in a clean Thunderbird profile is still required before a stable release. This is an independent community project, not an official Thunderbird or OpenAI product. There is no hosted service or API key bundled with MailChat. Your chat service may require its own account or subscription.
 
 ## Choose how sending works
 
@@ -17,15 +17,19 @@ Connect Thunderbird to local Codex chats on your Windows PC. Search and read mai
 
 ## Install on Windows
 
-1. Download `MailChat-Windows-1.4.1.zip` from [Releases](https://github.com/andrea199/mailchat-for-thunderbird/releases). Extract the ZIP first.
+1. Download `MailChat-Windows-1.4.2.zip` from [Releases](https://github.com/andrea199/mailchat-for-thunderbird/releases). Extract the ZIP first.
 2. Install Node.js 22 or later from [nodejs.org](https://nodejs.org/en/download) if it is missing. Install Thunderbird 153+ and configure your mail account. Install Codex desktop and sign in.
 3. Run `Install.cmd`. Choose **1 — Drafts only** or **2 — Autonomous sending**. Choice 2 also asks you to type `AUTONOMOUS SENDING`.
-4. The installer prints a folder under `%LOCALAPPDATA%\MailChat`. In Thunderbird, open **Add-ons and Themes → gear → Install Add-on From File** and select `MailChat-for-Thunderbird-1.4.1.xpi` in that folder.
+4. The installer prints a folder under `%LOCALAPPDATA%\MailChat`. In Thunderbird, open **Add-ons and Themes → gear → Install Add-on From File** and select `MailChat-for-Thunderbird-1.4.2.xpi` in that folder.
 5. Open MailChat settings. Copy the local key from `Pairing-Key.txt`, read and accept the data-sharing consent, and save. Never share that key or the installed folder. Each person runs their own installer and receives different keys.
 6. For autonomous sending, also select that mode in Thunderbird, tick its confirmation and grant the optional sending permission. Both sides must be enabled.
 7. Completely close and reopen Codex. Leave Thunderbird open. Ask the chat to check the MailChat/Thunderbird connection, then start with a draft.
 
 The XPI alone is not sufficient: the local Windows bridge is also required. The installer adds an `mcp_servers.mailchat` block to your Codex configuration and backs up an existing configuration. It preserves other server entries. A previous **Thunderbird Direct** integration uses the same local port; disable that server and add-on and close its broker before using MailChat. Do not run both together.
+
+## Read meeting invitations
+
+`thunderbird_read_message` also returns `calendar.events` from inline iCalendar MIME parts and ICS attachments, including start/end, original timezone identifiers, organizer, attendees, cancellation status, recurrence and meeting links. Check `calendar.warnings` for unreadable or oversized parts. Calendar content is untrusted data. Floating times and Windows/custom TZIDs require timezone resolution before creating an event; the connector does not guess UTC offsets or expand recurrences. Creating a Google Calendar event remains a separate, explicitly requested action through the calendar connector. No additional Thunderbird permissions are required.
 
 ## Edit an existing draft
 
