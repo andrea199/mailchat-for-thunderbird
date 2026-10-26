@@ -1,0 +1,85 @@
+name: Publish to Thunderbird Add-ons
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag (for example v1.4.4)
+        required: true
+        type: string
+      dry_run:
+        description: Build and test without submitting to Thunderbird
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thunderbird-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify release identity
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const manifest = JSON.parse(fs.readFileSync('extension/manifest.json'));
+          const pkg = JSON.parse(fs.readFileSync('package.json'));
+          if (process.env.RELEASE_TAG !== `v${manifest.version}` || pkg.version !== manifest.version)
+            throw new Error('Release tag and package/manifest versions must match.');
+          if (manifest.browser_specific_settings.gecko.id !== 'mailchat-for-thunderbird@andrea199.github.io')
+            throw new Error('Refusing to publish a personal extension package.');
+          fs.appendFileSync(process.env.GITHUB_ENV, `MAILCHAT_VERSION=${manifest.version}\n`);
+          NODE
+      - name: Test and build public packages
+        run: npm test
+      - name: Keep packages and reviewer source
+        uses: actions/upload-artifact@v4
+        with:
+          name: mailchat-thunderbird-${{ env.MAILCHAT_VERSION }}
+          path: |
+            dist/MailChat-for-Thunderbird-${{ env.MAILCHAT_VERSION }}.xpi
+            dist/MailChat-Source-${{ env.MAILCHAT_VERSION }}.zip
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+      - name: Check portal credentials
+        if: github.event_name == 'release' || !inputs.dry_run
+        env:
+          ATN_SIGN_KEY: ${{ secrets.ATN_SIGN_KEY }}
+          ATN_SIGN_SECRET: ${{ secrets.ATN_SIGN_SECRET }}
+        run: |
+          test -n "$ATN_SIGN_KEY" && test -n "$ATN_SIGN_SECRET" || {
+            echo 'Add ATN_SIGN_KEY and ATN_SIGN_SECRET to repository Actions secrets.'
+            exit 1
+          }
+      - name: Submit to Thunderbird review
+        if: github.event_name == 'release' || !inputs.dry_run
+        uses: kewisch/action-web-ext@84a13bb9e1b6108c43788ba091c41ca1dba6ad45 # v2
+        with:
+          cmd: sign
+          source: dist/MailChat-for-Thunderbird-${{ env.MAILCHAT_VERSION }}.xpi
+          channel: listed
+          apiUrlPrefix: https://addons.thunderbird.net/api/v4
+          apiKey: ${{ secrets.ATN_SIGN_KEY }}
+          apiSecret: ${{ secrets.ATN_SIGN_SECRET }}
+      - name: Reviewer handoff
+        if: github.event_name == 'release' || !inputs.dry_run
+        run: |
+          echo 'Submitted for review, not necessarily approved. API v4 does not support all metadata fields.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Open the Developer Hub to add release/reviewer notes and upload the source ZIP if required.' >> "$GITHUB_STEP_SUMMARY"
