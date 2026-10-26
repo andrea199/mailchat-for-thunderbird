@@ -43,11 +43,11 @@ test('status waits for a delayed Thunderbird reconnection',async()=>{
   await new Promise(r=>setTimeout(r,100));
   const request=await post('/next',{});
   assert.equal(request.method,'extension_status');
-  await post('/result',{id:request.id,ok:true,data:{version:'1.4.2',capabilities:[]}});
+  await post('/result',{id:request.id,ok:true,data:{version:'1.4.3',capabilities:[]}});
  })();
  try{
   const status=await callTool(c,'thunderbird_status',{});
-  assert.equal(status.addon_connected,true);assert.equal(status.extension.version,'1.4.2');
+  assert.equal(status.addon_connected,true);assert.equal(status.extension.version,'1.4.3');
   await extension;
  }finally{b.close();}
 });

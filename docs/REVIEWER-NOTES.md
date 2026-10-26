@@ -1,4 +1,4 @@
-# Reviewer notes — MailChat 1.4.2 beta
+# Reviewer notes — MailChat 1.4.3 beta
 
 This is an independent Thunderbird MailExtension paired with a local Node.js MCP bridge for Codex desktop on Windows. No paid developer site, hosted MailChat service, API credentials or private account data are required by this project. Codex itself requires its own account. The XPI alone does not provide the local bridge.
 
@@ -12,4 +12,4 @@ Required permissions provide account identities/signatures, message searching/re
 
 This release has automated mock/HTTP/installer tests; real Thunderbird/Codex end-to-end validation remains a beta testing requirement. It is not represented as already reviewed or approved by ATN.
 
-Version 1.4.2 adds list/read/update tools for existing open composers. Double-click a saved draft in Thunderbird first, then use list_drafts, read_draft and update_draft with the returned hash. Verify plain-text and HTML replacements, signature and quotation retention, unchanged attachments/Bcc/thread headers, and rejection after manual edits. Updates use setComposeDetails and saveMessage on the original tab; beginNew/EditAsNew is never used. Public APIs do not reopen closed saved drafts for in-place editing. No new permissions or Experiment APIs are requested. Updated drafts are sent manually; old automated send verification fails when content changes.
+Version 1.4.3 adds list/read/update tools for existing open composers. Double-click a saved draft in Thunderbird first, then use list_drafts, read_draft and update_draft with the returned hash. Verify plain-text and HTML replacements, signature and quotation retention, unchanged attachments/Bcc/thread headers, and rejection after manual edits. Updates use setComposeDetails and saveMessage on the original tab; beginNew/EditAsNew is never used. Public APIs do not reopen closed saved drafts for in-place editing. No new permissions or Experiment APIs are requested. Updated drafts are sent manually; old automated send verification fails when content changes.

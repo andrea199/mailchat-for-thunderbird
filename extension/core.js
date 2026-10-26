@@ -113,7 +113,7 @@
     if (method === 'prepare_reply') return TBReplies.prepare(args);
     if (method === 'send_reply') return TBOutbound.send(args,'reply');
     if (method === 'send_draft') return TBOutbound.send(args,'new');
-    if (method === 'extension_status') return {version:'1.4.2',...(await TBPolicy.status()),session,thunderbird:(await messenger.runtime.getBrowserInfo()).version,capabilities:['calendar_invites','read','search','new_draft','native_reply_draft','full_reply_history','account_format_and_signature','file_attachments','download_attachment','edit_open_draft']};
+    if (method === 'extension_status') return {version:'1.4.3',...(await TBPolicy.status()),session,thunderbird:(await messenger.runtime.getBrowserInfo()).version,capabilities:['calendar_invites','read','search','new_draft','native_reply_draft','full_reply_history','account_format_and_signature','file_attachments','download_attachment','edit_open_draft']};
     throw new Error('Unsupported operation.');
   }
   globalThis.TBDirect = {handle,compact,messageId,summary};

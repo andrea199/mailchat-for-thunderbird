@@ -102,6 +102,15 @@
       walk(root);
       if (candidates.length > 10) result.warnings.push('Only the first 10 calendar parts were read.');
       let rawFallback;
+      async function readRaw() {
+        if (rawFallback) return;
+        const file = await messenger.messages.getRaw(id, {data_format:'File'});
+        if (file.size > 5 * 1024 * 1024) throw new Error('Raw MIME fallback exceeds 5 MiB.');
+        rawFallback = rawCalendars(await file.text());
+        if (rawFallback.length > 10) result.warnings.push('Only the first 10 raw calendar parts were read.');
+        for (const text of rawFallback.slice(0, 10)) result.events.push(...parse(text).map(event => ({...event, source:'raw_mime'})));
+      }
+      if (!candidates.length) await readRaw();
       for (const part of candidates.slice(0, 10)) {
         try {
           if (part.size > MAX) throw new Error('Calendar part exceeds size limit.');
@@ -112,12 +121,7 @@
               if (file.size > MAX) throw new Error('Calendar attachment exceeds size limit.');
               body = await file.text();
             } catch {
-              if (!rawFallback) {
-                const file = await messenger.messages.getRaw(id, {data_format:'File'});
-                if (file.size > 5 * 1024 * 1024) throw new Error('Raw MIME fallback exceeds 5 MiB.');
-                rawFallback = rawCalendars(await file.text());
-                for (const text of rawFallback.slice(0, 10)) result.events.push(...parse(text).map(event => ({...event, source:'raw_mime'})));
-              }
+              await readRaw();
               continue;
             }
           }
